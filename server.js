@@ -4,7 +4,7 @@ var storage = {};
 
 var server = net.createServer( function(socket) {
   var guestName = 'Guest' + Math.floor(Math.random() * 9999999) + 1;
-  sendData(' connected. Welcome!', guestName);
+  sendData(' connected. Say Hello!', guestName);
   console.log(guestName + ' connected.');
   storage[guestName] = socket;
 
@@ -20,7 +20,7 @@ var server = net.createServer( function(socket) {
     if(data[0] === 47) {
       data = data.toString();
       if(data === '/help\n') {
-        socket.write('/name is the only command lol.');
+        socket.write('/name + /list');
       } else if (data.split(' ')[0] === '/name') {
         data = data.split(' ');
         var check = data[1].replace('\n', '');
@@ -35,8 +35,13 @@ var server = net.createServer( function(socket) {
           delete storage[pastName];
           console.log(pastName + ' has changed his name to ' + guestName);
         }
-      }
-      else {
+      } else if (data.split(' ')[0] === '/list') {
+          var userString = '';
+          for(var prop in storage) {
+            userString = prop + '\n';
+          }
+          socket.write(userString);
+        } else {
         socket.write('Type /help for a list of commands.');
       }
     }
@@ -59,7 +64,8 @@ process.stdout.on('data',function (data) {
       } else if (storage[check] === undefined) {
         console.log('User not found.');
       } else {
-        // storage[check].close(); kicking needs to happen here
+        storage[check].destroy();
+        delete storage[check];
       }
     }
   } else {
