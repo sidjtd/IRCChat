@@ -7,7 +7,7 @@ var storage = {};
  */
 var server = net.createServer( function(socket) {
   var guestName = 'Guest' + Math.floor(Math.random() * 9999999) + 1;
-  sendData(' connected. Say Hello!', guestName);
+  sendData('connected. Say Hello!', guestName);
   console.log(guestName + ' connected.');
   storage[guestName] = socket;
 
@@ -21,8 +21,21 @@ var server = net.createServer( function(socket) {
     delete storage[guestName];
   });
 
-  //Whenever they send data ver terminal, this is triggered. User commands.
+  socket.on('error', function () {}); //need something to handle errors
+
+  var timesReceived = 0;
+  //Whenever they send data via terminal, this is triggered. User commands.
+  setInterval(function() {
+    timesReceived = 0;
+  }, 600);
   socket.on('data', function (data) {
+    //flood protection
+    timesReceived++;
+    if(timesReceived >= 3) {
+      storage[guestName].destroy();
+      delete storage[guestName];
+    }
+
     if(data[0] === 47) {
       data = data.toString();
       if(data === '/help\n') {
@@ -53,6 +66,9 @@ var server = net.createServer( function(socket) {
             size++;
           }
           socket.write('There are currently ' + size + ' users online.');
+        } else if (data === '/enable\n') {
+          timeStamp = true;
+          socket.write('Timestamps have been enabled.');
         } else {
         socket.write('Type /help for a list of commands.');
       }
@@ -77,7 +93,7 @@ process.stdout.on('data',function (data) {
       data = data.split(' ');
       var check = data[1].replace('\n', '');
       if(data.length !== 2 || data[1].toLowerCase().includes('admin')) {
-        console.log('Invalid person to kick.');
+        console.log('Invalid user to kick.');
       } else if (storage[check] === undefined) {
         console.log('User not found.');
       } else {
