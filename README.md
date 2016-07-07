@@ -1,6 +1,6 @@
 # IRC Chat
 
-This project is simulates an IRC server by creating a server and client, and allowing them to talk to each other by opening up sockets with node.
+This project is simulates an IRC server by creating a server and client, and allows them to talk to each other by opening up sockets with node, with some tweaking this can be turned into an actual IRC server.
 
 **Installation**
 ```
