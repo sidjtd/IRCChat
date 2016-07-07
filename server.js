@@ -27,19 +27,21 @@ var server = net.createServer( function(socket) {
   //Whenever they send data via terminal, this is triggered. User commands.
   setInterval(function() {
     timesReceived = 0;
-  }, 600);
+  }, 1000);
   socket.on('data', function (data) {
     //flood protection
     timesReceived++;
     if(timesReceived >= 3) {
+      socket.write('<<<<< No Flooding. >>>>>');
       storage[guestName].destroy();
       delete storage[guestName];
+      console.log(guestName + ' has been kicked for flooding.');
     }
 
     if(data[0] === 47) {
       data = data.toString();
       if(data === '/help\n') {
-        socket.write('/name, /list, /status');
+        socket.write('/name, /list, /status, /msg (user)');
       } else if (data.split(' ')[0] === '/name') {
         data = data.split(' ');
         var check = data[1].replace('\n', '');
@@ -66,9 +68,20 @@ var server = net.createServer( function(socket) {
             size++;
           }
           socket.write('There are currently ' + size + ' users online.');
-        } else if (data === '/enable\n') {
-          timeStamp = true;
-          socket.write('Timestamps have been enabled.');
+        } else if (data.split(' ')[0] === '/msg' || data.split(' '[0] === '/msg\n')) {
+          data = data.split(' ');
+          if(data.length < 3) {
+            socket.write('Please type in a message using the format /msg (user) (message)');
+          }
+          data.shift();
+          var receiver = data.shift();
+          var message = data.join(' ');
+          if(storage[receiver] === undefined) {
+            socket.write('User not found, are you sure that person exists?');
+          } else {
+            storage[receiver].write('Private Message ' + '[' + guestName + '] ' + message);
+            console.log(guestName + '=======>' + receiver + ' ' + message);
+          }
         } else {
         socket.write('Type /help for a list of commands.');
       }
@@ -88,6 +101,7 @@ process.stdout.on('data',function (data) {
     data = data.toString();
     if(data === '/help\n') {
       console.log('/kick (user)');
+      return;
     }
     if(data.split(' ')[0] === '/kick') {
       data = data.split(' ');
@@ -100,6 +114,7 @@ process.stdout.on('data',function (data) {
         storage[check].destroy();
         delete storage[check];
       }
+      return;
     } else {
       console.log('Type /help for admin commands.');
     }

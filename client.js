@@ -5,6 +5,7 @@ var socket = net.Socket();
 //Change port and host to respective ips. IFCONFIG
 socket.connect(6969, function () {
   process.stdout.on('data',function (data) {
+    //flood function :^)
     if(data.toString().split(' ')[0] === '/flood') {
       data = data.toString().split(' ');
       data.shift();
