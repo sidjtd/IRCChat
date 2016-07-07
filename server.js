@@ -68,7 +68,7 @@ var server = net.createServer( function(socket) {
             size++;
           }
           socket.write('There are currently ' + size + ' users online.');
-        } else if (data.split(' ')[0] === '/msg' || data.split(' '[0] === '/msg\n')) {
+        } else if (data.split(' ')[0] === '/msg' || data.split(' ')[0] === '/msg\n') {
           data = data.split(' ');
           if(data.length < 3) {
             socket.write('Please type in a message using the format /msg (user) (message)');
