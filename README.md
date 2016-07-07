@@ -15,5 +15,7 @@ This project is simulates an IRC server by creating a server and client, and all
   Run the server.js first using node, then run the client.js.
 
   To simulate multiple users, just open up another terminal and run another client.js
+
+  People on your local network can also connect to it, if you change the hostname to your own.
 ```
 
